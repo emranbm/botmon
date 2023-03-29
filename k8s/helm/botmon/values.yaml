@@ -9,7 +9,7 @@ matchFinderPeriodSeconds: 300
 
 replicaCount: 1
 image:
-  repository: emranbm/botmon
+  repository: emranbm/botmon-backend
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
   tag: ""

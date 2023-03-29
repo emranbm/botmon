@@ -46,3 +46,9 @@ class User(AbstractUser, Contactable):
 
 class TargetBot(Contactable):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    class Meta:
+        constraints = [
+            # Should be checked differently whenever contact points other than Telegram are also supported.
+            models.UniqueConstraint(fields=['creator', 'telegram_username'], name="duplicate_bot_preventer")
+        ]

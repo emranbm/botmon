@@ -6,8 +6,6 @@ from telegram import Update
 from telegram.ext import ContextTypes
 
 from main import testing_utils
-from main.telegrambot.command_handlers.command_handler_with_metrics import CommandHandlerWithMetrics
-
 from main.telegrambot.command_handlers.base import BaseCommandHandler
 
 

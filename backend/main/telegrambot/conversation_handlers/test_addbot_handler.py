@@ -23,4 +23,6 @@ class AddBotHandlerTest(TestCase):
         context = testing_utils.create_default_context()
         update.message.text = "@my_bot"
         await AddBotHandler()._on_bot_username_entered(update, context)
-        self.assertTrue("already" in update.message.reply_html.call_args.args[0].lower())
+        response_text = update.message.reply_html.call_args.args[0]
+        self.assertTrue("already" in response_text.lower(),
+                        f"Unexpected response: {response_text}")

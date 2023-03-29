@@ -1,4 +1,3 @@
-import prometheus_client
 from django.conf import settings
 from telegram.ext import ApplicationBuilder, Application
 
@@ -21,8 +20,6 @@ class TelegramBotEngine:
 
     @staticmethod
     def run() -> None:
-        prometheus_client.start_http_server(settings.TELEGRAMBOT_METRICS_PORT)
-
         app = TelegramBotEngine.create_app()
         app.add_handler(StartCommandHandler())
         app.add_handler(AddBotHandler(), 1)
