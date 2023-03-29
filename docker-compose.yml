@@ -1,0 +1,22 @@
+version: "3.7"
+services:
+  backend:
+    image: ${DOCKER_IMAGES_PREFIX}-backend:${BOTMON_VERSION}
+    build:
+      context: backend/
+      args:
+        - HTTPS_PROXY
+    depends_on:
+      - database
+  database:
+    image: postgres:14.6-alpine3.17
+    environment:
+      - POSTGRES_PASSWORD=$BOTMON_DB_ROOT_PASSWORD
+      - BOTMON_DB_USER
+      - BOTMON_DB_PASSWORD
+      - BOTMON_DB_NAME
+    ports:
+      - $DB_PORT_MAPPING
+    volumes:
+      - ./.db-data/:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh

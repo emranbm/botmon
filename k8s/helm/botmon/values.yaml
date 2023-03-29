@@ -1,0 +1,60 @@
+# Default values for botmon.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+secretKey: dummy
+recaptchaServerKey: dummy
+djangoSettingsModule: backend.settings-production
+matchFinderPeriodSeconds: 300
+
+replicaCount: 1
+image:
+  repository: emranbm/botmon
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+resources:
+  cpu: 400m
+  memory: 128Mi
+  ephemeral-storage: 200Mi
+
+database:
+  host: postgresql
+  port: 5432
+  name: botmon_db
+  user: root
+  password: dummy
+
+imagePullSecrets: [ ]
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: { }
+
+podSecurityContext: { }
+# fsGroup: 2000
+
+securityContext: { }
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+# runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: { }
+
+tolerations: [ ]
+
+affinity: { }

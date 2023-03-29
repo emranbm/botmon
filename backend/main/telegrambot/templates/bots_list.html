@@ -1,0 +1,4 @@
+{% for bot in bots %}@{{ bot.telegram_username }}
+{% empty %}
+    You've no bots already. Send /addbot add one!
+{% endfor %}

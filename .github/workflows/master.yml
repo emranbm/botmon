@@ -1,0 +1,95 @@
+---
+name: Master Workflow
+on:
+  push:
+    branches:
+      - master
+env:
+  HELM_MAX_HISTORY: "5"
+jobs:
+  unit-tests:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'pipenv'
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+      - run: pipenv install
+        working-directory: ./backend/
+      - name: Start database
+        run: docker-compose up -d database
+      - name: Wait for DB to get ready
+        # TODO: Instead of blind sleep, check DB health.
+        run: sleep 2
+      - name: Run unit tests
+        working-directory: ./backend/
+        run: pipenv run python ./manage.py test
+  check-migrations:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+          cache: 'pipenv'
+      - name: Install pipenv
+        run: curl https://raw.githubusercontent.com/pypa/pipenv/master/get-pipenv.py | python
+      - run: pipenv install
+        working-directory: ./backend/
+      - run: pipenv run python ./manage.py makemigrations --dry-run --check
+        working-directory: ./backend/
+  build-backend-image:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          lfs: true
+      - run: echo "BOTMON_VERSION=master-${GITHUB_SHA}" >> $GITHUB_ENV
+      - name: Docker Login
+        run: echo ${{ secrets.DOCKER_REGISTRY_TOKEN }} | docker login -u ${{ vars.DOCKER_REGISTRY_USER }} --password-stdin ${{ vars.DOCKER_REGISTRY_HOST }}
+      - run: docker-compose build backend
+      - run: docker-compose push backend
+  deploy-botmon:
+    runs-on: ubuntu-20.04
+    needs:
+      - build-backend-image
+      - unit-tests
+      - check-migrations
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Kube config
+        run: >
+          KUBE_API_SERVER="${{ vars.KUBE_API_SERVER }}"
+          KUBE_NAMESPACE="${{ vars.KUBE_NAMESPACE }}"
+          KUBE_API_TOKEN="${{ secrets.KUBE_API_TOKEN }}"
+          ./.github/scripts/setup-kubectl.sh
+      - name: Deploy BotMon
+        run: >
+          helm upgrade -i botmon
+          --atomic
+          --set image.tag="master-${GITHUB_SHA}"
+          --set secretKey="${{ secrets.BOTMON_SECRET_KEY }}"
+          --set recaptchaServerKey="${{ secrets.RECAPTCHA_SERVER_KEY }}"
+          --set database.password="${{ secrets.POSTGRES_ROOT_PASSWORD }}"
+          k8s/helm/botmon/
+  deploy-socks-proxy:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Kube config
+        run: >
+          KUBE_API_SERVER="${{ vars.KUBE_API_SERVER }}"
+          KUBE_NAMESPACE="${{ vars.KUBE_NAMESPACE }}"
+          KUBE_API_TOKEN="${{ secrets.KUBE_API_TOKEN }}"
+          ./.github/scripts/setup-kubectl.sh
+      - name: Deploy Socks Proxy
+        run: >
+          helm upgrade -i botmon-socks-proxy
+          --atomic
+          --set host="${{ vars.SOCKS_HOST }}"
+          --set username="${{ vars.SOCKS_USER }}"
+          --set password="${{ secrets.SOCKS_PASS }}"
+          k8s/helm/socks-proxy/

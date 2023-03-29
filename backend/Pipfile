@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+Django = "==4.1.6"
+djangorestframework = "==3.14.0"
+drf-recaptcha = "==2.2.2"
+pytz = "==2022.7.1"
+psycopg2-binary = "==2.9.5"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
+
+[packages.python-telegram-bot]
+extras = [ "socks",]
+version = "==20.1"

@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "socks-proxy.fullname" . }}-test-connection"
+  labels:
+    {{- include "socks-proxy.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  containers:
+    - name: wget
+      image: busybox
+      command: ['wget']
+      args: ['{{ include "socks-proxy.fullname" . }}:{{ .Values.service.port }}']
+  restartPolicy: Never
