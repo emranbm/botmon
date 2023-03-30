@@ -1,6 +1,5 @@
-from datetime import datetime
-
 from asgiref.sync import sync_to_async
+from django.utils import timezone
 
 from main.health_checker.health_checker import HealthChecker
 from main.models import Alert
@@ -11,7 +10,7 @@ class AlertUpdater:
         self.health_checker = health_checker
 
     async def update_alerts(self):
-        now = datetime.now()
+        now = timezone.now()
         unhealthy_bots = self.health_checker.get_unhealthy_bots()
         unhealthy_bot_ids = []
         async for bot in unhealthy_bots:

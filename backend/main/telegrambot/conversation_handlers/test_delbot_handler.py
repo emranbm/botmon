@@ -10,7 +10,7 @@ class DelBotHandlerTest(TestCase):
         self.user = testing_utils.create_test_user()
 
     async def test_bot_should_get_deleted(self):
-        TargetBot.objects.acreate(creator=self.user, telegram_username="my_bot")
+        await TargetBot.objects.acreate(creator=self.user, telegram_username="my_bot")
         update = testing_utils.create_default_update()
         context = testing_utils.create_default_context()
         update.message.text = "@my_bot"

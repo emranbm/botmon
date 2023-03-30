@@ -7,8 +7,12 @@ from main.models import Alert
 from main.telegrambot.engine import TelegramBotEngine
 
 
-class TelegramicSender(AlertSender):
+class TelegramicAlertSender(AlertSender):
     async def send_alert(self, alert: Alert) -> bool:
+        if alert.is_fixed():
+            raise AssertionError("Alert is fixed!")
+        if alert.sent:
+            raise AssertionError("Alert is already sent!")
         app = TelegramBotEngine.create_app()
         target_bot = await get_model_prop(alert, 'target_bot')
         user = await get_model_prop(target_bot, 'creator')

@@ -30,7 +30,7 @@ async def create_test_user_async() -> User:
     return await sync_to_async(create_test_user)()
 
 
-def create_user_and_their_bot(self_telegram_username: str, bot_telegram_username: str) -> Tuple[User, TargetBot]:
+def create_user_and_their_bot(self_telegram_username: str = "user", bot_telegram_username: str = "bot") -> Tuple[User, TargetBot]:
     user = User.objects.create_user(f"{self_telegram_username}_local",
                                     telegram_username=self_telegram_username,
                                     telegram_user_id=randint(1, 1000000000000),
@@ -40,7 +40,7 @@ def create_user_and_their_bot(self_telegram_username: str, bot_telegram_username
     return user, bot
 
 
-async def create_user_and_their_bot_async(self_telegram_username: str, bot_telegram_username: str) -> Tuple[User, TargetBot]:
+async def create_user_and_their_bot_async(self_telegram_username: str = "user", bot_telegram_username: str = "bot") -> Tuple[User, TargetBot]:
     return await sync_to_async(create_user_and_their_bot)(self_telegram_username, bot_telegram_username)
 
 

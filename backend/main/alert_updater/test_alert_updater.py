@@ -1,8 +1,7 @@
-from datetime import datetime
 from typing import Iterable, AsyncIterable, List
-from unittest import skip
 
 from django.test import TestCase
+from django.utils import timezone
 
 from main import testing_utils
 from main.alert_updater.alert_updater import AlertUpdater
@@ -37,7 +36,7 @@ class AlertUpdaterTest(TestCase):
         self.assertEqual(1, await Alert.objects.filter(target_bot=self.bot).acount())
 
     async def test_should_save_new_alert_when_non_active_alert_exists(self):
-        await Alert.objects.acreate(target_bot=self.bot, fixed_at=datetime.now())
+        await Alert.objects.acreate(target_bot=self.bot, fixed_at=timezone.now())
         await self._update_alerts([self.bot])
         self.assertEqual(2, await Alert.objects.filter(target_bot=self.bot).acount())
         self.assertEqual(1, await Alert.objects.filter(target_bot=self.bot, fixed_at=None).acount())
