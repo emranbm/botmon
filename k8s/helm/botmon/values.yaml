@@ -6,6 +6,14 @@ secretKey: dummy
 recaptchaServerKey: dummy
 djangoSettingsModule: backend.settings-production
 matchFinderPeriodSeconds: 300
+telegramClient:
+  sessionString: dummy
+  apiId: 12345
+  apiHash: dummy
+healthCheck:
+  timeoutSeconds: 1
+  pingMessage: '/botmoncheck'
+  periodSeconds: 60
 
 replicaCount: 1
 image:

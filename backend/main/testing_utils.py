@@ -1,5 +1,5 @@
 from random import randint
-from typing import Optional
+from typing import Optional, Tuple
 from unittest.mock import Mock, AsyncMock, patch
 
 from asgiref.sync import sync_to_async
@@ -30,17 +30,17 @@ async def create_test_user_async() -> User:
     return await sync_to_async(create_test_user)()
 
 
-def create_user_and_their_bot(self_telegram_username: str, bot_telegram_username: str) -> User:
+def create_user_and_their_bot(self_telegram_username: str, bot_telegram_username: str) -> Tuple[User, TargetBot]:
     user = User.objects.create_user(f"{self_telegram_username}_local",
                                     telegram_username=self_telegram_username,
                                     telegram_user_id=randint(1, 1000000000000),
                                     telegram_chat_id=randint(1, 1000000000000),
                                     )
-    TargetBot(creator=user, telegram_username=bot_telegram_username).save()
-    return user
+    bot = TargetBot.objects.create(creator=user, telegram_username=bot_telegram_username)
+    return user, bot
 
 
-async def create_user_and_their_bot_async(self_telegram_username: str, bot_telegram_username: str) -> User:
+async def create_user_and_their_bot_async(self_telegram_username: str, bot_telegram_username: str) -> Tuple[User, TargetBot]:
     return await sync_to_async(create_user_and_their_bot)(self_telegram_username, bot_telegram_username)
 
 

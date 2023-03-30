@@ -9,6 +9,8 @@ djangorestframework = "==3.14.0"
 drf-recaptcha = "==2.2.2"
 pytz = "==2022.7.1"
 psycopg2-binary = "==2.9.5"
+telethon = "==1.27.0"
+pysocks = "==1.7.1"
 
 [dev-packages]
 

@@ -1,55 +1,60 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "botmon.fullname" . }}
+  name: {{ include "botmon.fullname" . }}-alert-updater
   labels:
-    {{- include "botmon.labels" . | nindent 4 }}
+    botmon-service: alert-updater
 spec:
-  {{- if not .Values.autoscaling.enabled }}
-  replicas: {{ .Values.replicaCount }}
-  {{- end }}
+  replicas: 1 # Hardcoded to prevent concurrency issues.
   selector:
     matchLabels:
-      {{- include "botmon.selectorLabels" . | nindent 6 }}
+      botmon-service: alert-updater
   template:
     metadata:
       {{- with .Values.podAnnotations }}
       annotations:
-        {{- toYaml . | nindent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "botmon.selectorLabels" . | nindent 8 }}
+        botmon-service: alert-updater
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
       securityContext:
-        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Chart.Name }}-alert-updater
           securityContext:
           {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command:
+            - python
+            - -u
+            - manage.py
+            - alertupdater
+            - --period
+            - {{ .Values.healthCheck.periodSeconds }}
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          ports:
-            - name: backend
-              containerPort: 80
-              protocol: TCP
-          livenessProbe:
-            httpGet:
-              path: /api/
-              port: backend
           resources:
             limits:
             {{- toYaml .Values.resources | nindent 14 }}
             requests:
           {{- toYaml .Values.resources | nindent 14 }}
           env:
+            - name: BOTMON_TELEGRAM_AGENT_SESSION_STRING
+              value: "{{ .Values.telegramClient.sessionString }}"
+            - name: BOTMON_TELEGRAM_AGENT_API_ID
+              value: "{{ .Values.telegramClient.apiId }}"
+            - name: BOTMON_TELEGRAM_AGENT_API_HASH
+              value: "{{ .Values.telegramClient.apiHash }}"
+            - name: BOTMON_TELEGRAM_AGENT_HEALTH_CHECK_MESSAGE
+              value: "{{ .Values.healthCheck.pingMessage }}"
+            - name: BOTMON_TELEGRAM_AGENT_HEALTH_CHECK_TIMEOUT_SECONDS
+              value: "{{ .Values.healthCheck.timeoutSeconds }}"
             - name: BOTMON_SECRET_KEY
               value: "{{ .Values.secretKey }}"
-            - name: RECAPTCHA_SERVER_KEY
-              value: "{{ .Values.recaptchaServerKey }}"
             - name: DJANGO_SETTINGS_MODULE
               value: "{{ .Values.djangoSettingsModule }}"
             - name: BOTMON_DB_HOST
@@ -64,13 +69,13 @@ spec:
               value: "{{ .Values.database.password }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
-        {{- toYaml . | nindent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.affinity }}
       affinity:
-        {{- toYaml . | nindent 8 }}
+      {{- toYaml . | nindent 8 }}
       {{- end }}
       {{- with .Values.tolerations }}
       tolerations:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+  {{- toYaml . | nindent 8 }}
+  {{- end }}

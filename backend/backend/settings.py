@@ -33,15 +33,15 @@ CURRENT_APPS = [
 ]
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'rest_framework',
-    'rest_framework.authtoken',
-] + CURRENT_APPS
+                     'django.contrib.admin',
+                     'django.contrib.auth',
+                     'django.contrib.contenttypes',
+                     'django.contrib.sessions',
+                     'django.contrib.messages',
+                     'django.contrib.staticfiles',
+                     'rest_framework',
+                     'rest_framework.authtoken',
+                 ] + CURRENT_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -164,3 +164,9 @@ DRF_RECAPTCHA_TESTING = True
 
 TELEGRAM_BOT_TOKEN = os.environ.get('BOTMON_TELEGRAM_BOT_TOKEN', 'dummy')
 TELEGRAM_PROXY_URL = os.environ.get('BOTMON_TELEGRAM_PROXY_URL', None)
+
+TELEGRAM_AGENT_SESSION_STRING = os.environ.get('BOTMON_TELEGRAM_AGENT_SESSION_STRING', 'dummy')
+TELEGRAM_AGENT_API_ID = int(os.environ.get('BOTMON_TELEGRAM_AGENT_API_ID', 12345))
+TELEGRAM_AGENT_API_HASH = os.environ.get('BOTMON_TELEGRAM_AGENT_API_HASH', 'dummy')
+TELEGRAM_AGENT_HEALTH_CHECK_MESSAGE = os.environ.get('BOTMON_TELEGRAM_AGENT_HEALTH_CHECK_MESSAGE', '/botmoncheck')
+TELEGRAM_AGENT_HEALTH_CHECK_TIMEOUT_SECONDS = int(os.environ.get('BOTMON_TELEGRAM_AGENT_HEALTH_CHECK_TIMEOUT_SECONDS', 1))

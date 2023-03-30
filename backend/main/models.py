@@ -52,3 +52,13 @@ class TargetBot(Contactable):
             # Should be checked differently whenever contact points other than Telegram are also supported.
             models.UniqueConstraint(fields=['creator', 'telegram_username'], name="duplicate_bot_preventer")
         ]
+
+
+class Alert(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    fixed_at = models.DateTimeField(null=True)
+    target_bot = models.ForeignKey(TargetBot, on_delete=models.CASCADE)
+    sent = models.BooleanField(default=False)
+
+    def is_fixed(self) -> bool:
+        return self.fixed_at is not None
