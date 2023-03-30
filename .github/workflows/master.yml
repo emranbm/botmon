@@ -90,7 +90,7 @@ jobs:
           ./.github/scripts/setup-kubectl.sh
       - name: Deploy Socks Proxy
         run: >
-          helm upgrade -i botmon-socks-proxy
+          helm upgrade -i socks-proxy
           --atomic
           --set host="${{ vars.SOCKS_HOST }}"
           --set username="${{ vars.SOCKS_USER }}"
