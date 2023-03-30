@@ -67,6 +67,8 @@ spec:
               value: "{{ .Values.database.user }}"
             - name: BOTMON_DB_PASSWORD
               value: "{{ .Values.database.password }}"
+            - name: BOTMON_TELEGRAM_PROXY_URL
+              value: {{ .Values.proxyUrl }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
       {{- toYaml . | nindent 8 }}

@@ -6,6 +6,8 @@ secretKey: dummy
 recaptchaServerKey: dummy
 djangoSettingsModule: backend.settings-production
 matchFinderPeriodSeconds: 300
+proxyUrl: "socks5://socks-proxy:8123"
+telegramBotToken: dummy
 telegramClient:
   sessionString: dummy
   apiId: 12345

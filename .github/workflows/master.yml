@@ -74,6 +74,7 @@ jobs:
           --set secretKey="${{ secrets.BOTMON_SECRET_KEY }}"
           --set recaptchaServerKey="${{ secrets.RECAPTCHA_SERVER_KEY }}"
           --set database.password="${{ secrets.POSTGRES_ROOT_PASSWORD }}"
+          --set telegramBotToken="${{ secrets.BOTMON_TELEGRAM_BOT_TOKEN }}"
           --set telegramClient.sessionString="${{ secrets.BOTMON_TELEGRAM_AGENT_SESSION_STRING }}"
           --set telegramClient.apiId="${{ secrets.BOTMON_TELEGRAM_AGENT_API_ID }}"
           --set telegramClient.apiHash="${{ secrets.BOTMON_TELEGRAM_AGENT_API_HASH }}"
