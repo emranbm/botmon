@@ -35,7 +35,7 @@ spec:
             - manage.py
             - alertupdater
             - --period
-            - {{ .Values.healthCheck.periodSeconds }}
+            - "{{ .Values.healthCheck.periodSeconds }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           resources:
             limits:
