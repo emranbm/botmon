@@ -1,0 +1,75 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "botmon.fullname" . }}-alert-sender
+  labels:
+    botmon-service: alert-sender
+spec:
+  replicas: 1 # Hardcoded to prevent concurrency issues.
+  selector:
+    matchLabels:
+      botmon-service: alert-sender
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        botmon-service: alert-sender
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+      {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}-alert-sender
+          securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command:
+            - python
+            - -u
+            - manage.py
+            - alertsender
+            - --period
+            - "{{ .Values.alertSendingPeriodSeconds }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            limits:
+            {{- toYaml .Values.resources | nindent 14 }}
+            requests:
+          {{- toYaml .Values.resources | nindent 14 }}
+          env:
+            - name: BOTMON_SECRET_KEY
+              value: "{{ .Values.secretKey }}"
+            - name: DJANGO_SETTINGS_MODULE
+              value: "{{ .Values.djangoSettingsModule }}"
+            - name: BOTMON_DB_HOST
+              value: "{{ .Values.database.host }}"
+            - name: BOTMON_DB_PORT
+              value: "{{ .Values.database.port }}"
+            - name: BOTMON_DB_NAME
+              value: "{{ .Values.database.name }}"
+            - name: BOTMON_DB_USER
+              value: "{{ .Values.database.user }}"
+            - name: BOTMON_DB_PASSWORD
+              value: "{{ .Values.database.password }}"
+            - name: BOTMON_TELEGRAM_BOT_TOKEN
+              value: {{ .Values.telegramBotToken }}
+            - name: BOTMON_TELEGRAM_PROXY_URL
+              value: {{ .Values.proxyUrl }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+      {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+  {{- toYaml . | nindent 8 }}
+  {{- end }}
