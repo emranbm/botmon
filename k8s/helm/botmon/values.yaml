@@ -29,7 +29,7 @@ resources:
   ephemeral-storage: 200Mi
 
 database:
-  host: postgresql.crushback
+  host: postgresql
   port: 5432
   name: botmon_db
   user: root
