@@ -8,6 +8,7 @@ djangoSettingsModule: backend.settings-production
 proxyUrl: "socks5://socks-proxy:8123"
 telegramBotToken: dummy
 alertSendingPeriodSeconds: 60
+selfHeartbeatReceiverChatId: 12345
 telegramClient:
   sessionString: dummy
   apiId: 12345

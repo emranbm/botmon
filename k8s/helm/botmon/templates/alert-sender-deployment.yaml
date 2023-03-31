@@ -58,9 +58,11 @@ spec:
             - name: BOTMON_DB_PASSWORD
               value: "{{ .Values.database.password }}"
             - name: BOTMON_TELEGRAM_BOT_TOKEN
-              value: {{ .Values.telegramBotToken }}
+              value: "{{ .Values.telegramBotToken }}"
             - name: BOTMON_TELEGRAM_PROXY_URL
-              value: {{ .Values.proxyUrl }}
+              value: "{{ .Values.proxyUrl }}"
+            - name: BOTMON_HEARTBEAT_RECEIVER_CHAT_ID
+              value: "{{ .Values.selfHeartbeatReceiverChatId }}"
       {{- with .Values.nodeSelector }}
       nodeSelector:
       {{- toYaml . | nindent 8 }}

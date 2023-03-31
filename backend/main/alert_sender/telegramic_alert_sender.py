@@ -1,4 +1,5 @@
 import telegram
+from django.conf import settings
 from django.template.loader import render_to_string
 from main.utils.async_utils import get_model_prop
 
@@ -17,6 +18,11 @@ class TelegramicAlertSender(AlertSender):
         if not alert.is_fixed():
             raise AssertionError("Alert is not fixed!")
         return await self._send_message_for_alert(alert, 'alert_fixed_message.html')
+
+    async def send_heartbeat_to_admin(self, message: str):
+        app = TelegramBotEngine.create_app()
+        await app.bot.send_message(chat_id=settings.HEARTBEAT_RECEIVER_CHAT_ID,
+                                   text=message)
 
     @staticmethod
     async def _send_message_for_alert(alert: Alert, message_template: str) -> bool:
