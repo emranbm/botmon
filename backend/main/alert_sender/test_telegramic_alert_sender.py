@@ -10,20 +10,24 @@ from main.models import Alert
 
 
 class TelegramicAlertSenderTest(TestCase):
+    @staticmethod
+    def _get_alert_sender():
+        return TelegramicAlertSender(enable_heartbeat=False)
+
     @testing_utils.mock_telegram_bot_engine_async
     async def test_should_send_alert(self, mocked_telegram_app: Application):
         user, bot = await testing_utils.create_user_and_their_bot_async()
         await Alert.objects.acreate(target_bot=bot)
-        await TelegramicAlertSender().send_appropriate_alerts()
+        await self._get_alert_sender().send_appropriate_alerts()
         mocked_send_message: AsyncMock = mocked_telegram_app.bot.send_message
-        mocked_send_message.assert_called()
+        mocked_send_message.assert_called_once()
         self.assertEqual(user.telegram_chat_id, mocked_send_message.call_args_list[0].kwargs['chat_id'])
 
     @testing_utils.mock_telegram_bot_engine_async
     async def test_alert_should_contain_appropriate_message(self, mocked_telegram_app: Application):
         user, bot = await testing_utils.create_user_and_their_bot_async()
         await Alert.objects.acreate(target_bot=bot)
-        await TelegramicAlertSender().send_appropriate_alerts()
+        await self._get_alert_sender().send_appropriate_alerts()
         mocked_send_message: AsyncMock = mocked_telegram_app.bot.send_message
         alert_text: str = mocked_send_message.call_args_list[0].kwargs['text']
         self.assertTrue(bot.telegram_username in alert_text)
@@ -35,7 +39,7 @@ class TelegramicAlertSenderTest(TestCase):
         user, bot = await testing_utils.create_user_and_their_bot_async()
         alert = await Alert.objects.acreate(target_bot=bot, fixed_at=timezone.now())
         with self.assertRaises(AssertionError):
-            await TelegramicAlertSender().send_alert(alert)
+            await self._get_alert_sender().send_alert(alert)
         mocked_send_message: AsyncMock = mocked_telegram_app.bot.send_message
         mocked_send_message.assert_not_called()
 
@@ -43,15 +47,15 @@ class TelegramicAlertSenderTest(TestCase):
     async def test_send_alert_method_should_send_already_sent_alert_again(self, mocked_telegram_app: Application):
         user, bot = await testing_utils.create_user_and_their_bot_async()
         alert = await Alert.objects.acreate(target_bot=bot, sent=True)
-        await TelegramicAlertSender().send_alert(alert)
+        await self._get_alert_sender().send_alert(alert)
         mocked_send_message: AsyncMock = mocked_telegram_app.bot.send_message
-        mocked_send_message.assert_called()
+        mocked_send_message.assert_called_once()
 
     @testing_utils.mock_telegram_bot_engine_async
     async def test_already_sent_alerts_should_not_get_sent_again(self, mocked_telegram_app: Application):
         user, bot = await testing_utils.create_user_and_their_bot_async()
         await Alert.objects.acreate(target_bot=bot, sent=True)
-        await TelegramicAlertSender().send_appropriate_alerts()
+        await self._get_alert_sender().send_appropriate_alerts()
         mocked_send_message: AsyncMock = mocked_telegram_app.bot.send_message
         mocked_send_message.assert_not_called()
 
@@ -59,9 +63,9 @@ class TelegramicAlertSenderTest(TestCase):
     async def test_should_inform_fixed_alert(self, mocked_telegram_app: Application):
         user, bot = await testing_utils.create_user_and_their_bot_async()
         await Alert.objects.acreate(target_bot=bot, fixed_at=timezone.now(), sent=False)
-        await TelegramicAlertSender().send_appropriate_alerts()
+        await self._get_alert_sender().send_appropriate_alerts()
         mocked_send_message: AsyncMock = mocked_telegram_app.bot.send_message
-        mocked_send_message.assert_called()
+        mocked_send_message.assert_called_once()
         self.assertTrue("up" in mocked_send_message.call_args_list[0].kwargs['text'].lower())
 
     @testing_utils.mock_telegram_bot_engine_async
@@ -69,6 +73,6 @@ class TelegramicAlertSenderTest(TestCase):
         user, bot = await testing_utils.create_user_and_their_bot_async()
         alert = await Alert.objects.acreate(target_bot=bot)
         with self.assertRaises(AssertionError):
-            await TelegramicAlertSender().send_alert_fixed(alert)
+            await self._get_alert_sender().send_alert_fixed(alert)
         mocked_send_message: AsyncMock = mocked_telegram_app.bot.send_message
         mocked_send_message.assert_not_called()

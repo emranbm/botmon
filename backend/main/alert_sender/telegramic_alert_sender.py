@@ -9,6 +9,10 @@ from main.telegrambot.engine import TelegramBotEngine
 
 
 class TelegramicAlertSender(AlertSender):
+    def __init__(self, enable_heartbeat: bool = True):
+        super().__init__()
+        self._enable_heartbeat = enable_heartbeat
+
     async def send_alert(self, alert: Alert) -> bool:
         if alert.is_fixed():
             raise AssertionError("Alert is fixed!")
@@ -20,6 +24,8 @@ class TelegramicAlertSender(AlertSender):
         return await self._send_message_for_alert(alert, 'alert_fixed_message.html')
 
     async def send_heartbeat_to_admin(self, message: str):
+        if not self._enable_heartbeat:
+            return
         app = TelegramBotEngine.create_app()
         await app.bot.send_message(chat_id=settings.HEARTBEAT_RECEIVER_CHAT_ID,
                                    text=message)
