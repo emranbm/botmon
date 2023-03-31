@@ -18,7 +18,8 @@ class AlertUpdater:
             active_alert_already_exist = await Alert.objects.filter(target_bot=bot, fixed_at=None).aexists()
             if not active_alert_already_exist:
                 await Alert.objects.acreate(target_bot=bot)
-        fixed_alerts = Alert.objects.exclude(target_bot_id__in=unhealthy_bot_ids).filter(fixed_at=None).aiterator()
-        async for alert in fixed_alerts:
+        newly_fixed_alerts = Alert.objects.exclude(target_bot_id__in=unhealthy_bot_ids).filter(fixed_at=None).aiterator()
+        async for alert in newly_fixed_alerts:
             alert.fixed_at = now
+            alert.sent = False
             await sync_to_async(alert.save)()

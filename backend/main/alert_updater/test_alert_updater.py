@@ -43,9 +43,15 @@ class AlertUpdaterTest(TestCase):
         self.assertEqual(2, await Alert.objects.filter(target_bot=self.bot).acount())
         self.assertEqual(1, await Alert.objects.filter(target_bot=self.bot, fixed_at=None).acount())
 
-    async def test_should_mark_alert_as_not_sent_when_fixed(self):
+    async def test_should_mark_alert_as_fixed_when_fixed(self):
         alert = await Alert.objects.acreate(target_bot=self.bot)
         self.assertFalse(alert.is_fixed())
         await self._update_alerts([])
         await sync_to_async(alert.refresh_from_db)()
         self.assertTrue(alert.is_fixed())
+
+    async def test_should_mark_alert_as_non_sent_when_fixed(self):
+        alert = await Alert.objects.acreate(target_bot=self.bot, sent=True)
+        await self._update_alerts([])
+        await sync_to_async(alert.refresh_from_db)()
+        self.assertFalse(alert.sent)
