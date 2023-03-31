@@ -1,5 +1,6 @@
 import asyncio
 from argparse import ArgumentParser
+from time import sleep
 
 from django.core.management import BaseCommand
 
@@ -22,4 +23,4 @@ class Command(BaseCommand):
         alert_updater = AlertUpdater(HealthChecker())
         while True:
             asyncio.run(alert_updater.update_alerts())
-            asyncio.sleep(period_seconds)
+            sleep(period_seconds)

@@ -1,5 +1,6 @@
 import asyncio
 from argparse import ArgumentParser
+from time import sleep
 
 from django.core.management import BaseCommand
 
@@ -23,4 +24,4 @@ class Command(BaseCommand):
         alert_sender = TelegramicAlertSender()
         while True:
             asyncio.run(alert_sender.send_appropriate_alerts())
-            asyncio.sleep(period_seconds)
+            sleep(period_seconds)
