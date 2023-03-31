@@ -14,7 +14,7 @@ telegramClient:
   apiId: 12345
   apiHash: dummy
 healthCheck:
-  timeoutSeconds: 1
+  timeoutSeconds: 3
   pingMessage: '/botmoncheck'
   periodSeconds: 60
 
