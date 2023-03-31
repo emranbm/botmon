@@ -23,7 +23,8 @@ class AlertUpdaterTest(TestCase):
     def setUp(self) -> None:
         self.user, self.bot = testing_utils.create_user_and_their_bot("user", "user_bot")
 
-    async def _update_alerts(self, unhealthy_bots: List[TargetBot]):
+    @staticmethod
+    async def _update_alerts(unhealthy_bots: List[TargetBot]):
         alert_updater = AlertUpdater(MockedHeathChecker(unhealthy_bots=unhealthy_bots))
         await alert_updater.update_alerts()
 
