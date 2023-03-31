@@ -32,7 +32,11 @@ class AlertSender(ABC):
         pass
 
     @abstractmethod
-    async def send_heartbeat_to_admin(self, message: str):
+    async def send_heartbeat_to_admin(self) -> None:
+        """
+        Sending a heartbeat to someone ensures the monitoring system itself is up and running.
+        This method is called periodically. Its period is defined in settings as HEARTBEAT_PERIOD_SECONDS
+        """
         pass
 
     async def send_appropriate_alerts(self):
@@ -49,8 +53,7 @@ class AlertSender(ABC):
                 sent_count += 1
                 alert.sent = True
                 await sync_to_async(alert.save)()
-        summary = f"Informed {sent_count} alerts (or fixed alerts) out of {total_count}."
-        logging.info(summary)
+        logging.info(f"Informed {sent_count} alerts (or fixed alerts) out of {total_count}.")
         if (timezone.now() - self._last_heartbeat_time).total_seconds() >= settings.HEARTBEAT_PERIOD_SECONDS:
-            await self.send_heartbeat_to_admin(summary)
+            await self.send_heartbeat_to_admin()
             self._last_heartbeat_time = timezone.now()

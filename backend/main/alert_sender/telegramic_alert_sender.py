@@ -23,12 +23,12 @@ class TelegramicAlertSender(AlertSender):
             raise AssertionError("Alert is not fixed!")
         return await self._send_message_for_alert(alert, 'alert_fixed_message.html')
 
-    async def send_heartbeat_to_admin(self, message: str):
+    async def send_heartbeat_to_admin(self):
         if not self._enable_heartbeat:
             return
         app = TelegramBotEngine.create_app()
         await app.bot.send_message(chat_id=settings.HEARTBEAT_RECEIVER_CHAT_ID,
-                                   text=message)
+                                   text="Heartbeat: I'm alive!")
 
     @staticmethod
     async def _send_message_for_alert(alert: Alert, message_template: str) -> bool:
