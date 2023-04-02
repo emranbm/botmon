@@ -1,7 +1,7 @@
 import asyncio
 from unittest.mock import patch, MagicMock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from telethon.tl.custom import Conversation
 
 from main import testing_utils
@@ -27,8 +27,9 @@ class HealthCheckerTest(TestCase):
         unhealthy_bots = [b async for b in health_checker.get_unhealthy_bots()]
         self.assertEqual(1, len(unhealthy_bots))
 
+    @override_settings(TELEGRAM_AGENT_HEALTH_CHECK_RETRIES=1)
     @_patch_telegram_client
-    async def test_should_retry_failure(self, conversation: Conversation):
+    async def test_should_retry_on_failure(self, conversation: Conversation):
         await testing_utils.create_user_and_their_bot_async("user", "bot")
         health_checker = HealthChecker()
         tries = 0
