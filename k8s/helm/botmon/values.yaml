@@ -15,6 +15,7 @@ telegramClient:
   apiHash: dummy
 healthCheck:
   timeoutSeconds: 3
+  retries: 1
   pingMessage: '/botmoncheck'
   periodSeconds: 60
 

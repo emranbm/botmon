@@ -1,7 +1,7 @@
 import asyncio
 from asyncio import sleep
 from contextlib import asynccontextmanager
-from typing import List, AsyncIterable, Optional
+from typing import AsyncIterable
 from urllib.parse import urlparse
 
 import socks
@@ -21,9 +21,15 @@ class HealthChecker:
                 async with self._create_conversation(target_bot.telegram_username, telegram_client) as conv:
                     conv: Conversation
                     await conv.send_message(settings.TELEGRAM_AGENT_HEALTH_CHECK_MESSAGE)
-                    try:
-                        await conv.get_response(timeout=settings.TELEGRAM_AGENT_HEALTH_CHECK_TIMEOUT_SECONDS)
-                    except asyncio.TimeoutError:
+                    responded = False
+                    for i in range(0, settings.TELEGRAM_AGENT_HEALTH_CHECK_RETRIES + 1):
+                        try:
+                            await conv.get_response(timeout=settings.TELEGRAM_AGENT_HEALTH_CHECK_TIMEOUT_SECONDS)
+                            responded = True
+                            break
+                        except asyncio.TimeoutError:
+                            pass
+                    if not responded:
                         yield target_bot
 
     @asynccontextmanager

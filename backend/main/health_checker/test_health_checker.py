@@ -28,6 +28,22 @@ class HealthCheckerTest(TestCase):
         self.assertEqual(1, len(unhealthy_bots))
 
     @_patch_telegram_client
+    async def test_should_retry_failure(self, conversation: Conversation):
+        await testing_utils.create_user_and_their_bot_async("user", "bot")
+        health_checker = HealthChecker()
+        tries = 0
+
+        async def fake_get_response(*args, **kwargs):
+            nonlocal tries
+            if tries == 0:
+                tries += 1
+                raise asyncio.TimeoutError()
+
+        conversation.get_response = fake_get_response
+        unhealthy_bots = [b async for b in health_checker.get_unhealthy_bots()]
+        self.assertEqual(0, len(unhealthy_bots))
+
+    @_patch_telegram_client
     async def test_should_not_return_healthy_bot(self, conversation: Conversation):
         await testing_utils.create_user_and_their_bot_async("user", "bot")
         health_checker = HealthChecker()

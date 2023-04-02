@@ -53,6 +53,8 @@ spec:
               value: "{{ .Values.healthCheck.pingMessage }}"
             - name: BOTMON_TELEGRAM_AGENT_HEALTH_CHECK_TIMEOUT_SECONDS
               value: "{{ .Values.healthCheck.timeoutSeconds }}"
+            - name: BOTMON_TELEGRAM_AGENT_HEALTH_CHECK_RETRIES
+              value: "{{ .Values.healthCheck.retries }}"
             - name: BOTMON_SECRET_KEY
               value: "{{ .Values.secretKey }}"
             - name: DJANGO_SETTINGS_MODULE
