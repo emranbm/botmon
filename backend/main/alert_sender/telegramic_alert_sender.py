@@ -36,7 +36,7 @@ class TelegramicAlertSender(AlertSender):
         target_bot = await get_model_prop(alert, 'target_bot')
         user = await get_model_prop(target_bot, 'creator')
 
-        message = render_to_string(message_template, {'target_bot': target_bot})
+        message = render_to_string(message_template, {'target_bot': target_bot, 'down_minutes': settings.ALERT_CERTAINTY_WAIT_SECONDS // 60})
         await app.bot.send_message(chat_id=user.telegram_chat_id,
                                    text=message,
                                    parse_mode=telegram.constants.ParseMode.HTML)

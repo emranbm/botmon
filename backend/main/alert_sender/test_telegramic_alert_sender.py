@@ -1,6 +1,6 @@
 from unittest.mock import AsyncMock
 
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.utils import timezone
 from telegram.ext import Application
 
@@ -9,6 +9,7 @@ from main.alert_sender.telegramic_alert_sender import TelegramicAlertSender
 from main.models import Alert
 
 
+@override_settings(ALERT_CERTAINTY_WAIT_SECONDS=0)
 class TelegramicAlertSenderTest(TestCase):
     @staticmethod
     def _get_alert_sender():

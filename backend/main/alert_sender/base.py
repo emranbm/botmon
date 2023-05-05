@@ -45,10 +45,12 @@ class AlertSender(ABC):
         sent_count = 0
         async for alert in alerts:
             total_count += 1
+            sent = False
             if alert.is_fixed():
                 sent = await self.send_alert_fixed(alert)
             else:
-                sent = await self.send_alert(alert)
+                if alert.created_at <= timezone.now() - timedelta(seconds=settings.ALERT_CERTAINTY_WAIT_SECONDS):
+                    sent = await self.send_alert(alert)
             if sent:
                 sent_count += 1
                 alert.sent = True
