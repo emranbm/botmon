@@ -1,8 +1,12 @@
 import random
 import string
+from datetime import timedelta, datetime
+from typing import Optional
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 
 class _AutoCleanedModel(models.Model):
@@ -62,3 +66,11 @@ class Alert(models.Model):
 
     def is_fixed(self) -> bool:
         return self.fixed_at is not None
+
+    def has_passed_certainty_waiting_period(self, current_time: Optional[datetime] = None):
+        """
+        Determines whether the alert is fully active (i.e. has waited for certainty period and has not fixed yet) or not.
+        :param current_time: The current time to evaluate the alert age.
+        :return: True if the alert age has passed the certainty waiting period (and hence should be informed). Otherwise False.
+        """
+        return (current_time or timezone.now()) - self.created_at >= timedelta(seconds=settings.ALERT_CERTAINTY_WAIT_SECONDS)

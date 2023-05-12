@@ -1,3 +1,4 @@
+from datetime import timedelta
 from unittest.mock import AsyncMock
 
 from django.test import TestCase, override_settings
@@ -63,7 +64,7 @@ class TelegramicAlertSenderTest(TestCase):
     @testing_utils.mock_telegram_bot_engine_async
     async def test_should_inform_fixed_alert(self, mocked_telegram_app: Application):
         user, bot = await testing_utils.create_user_and_their_bot_async()
-        await Alert.objects.acreate(target_bot=bot, fixed_at=timezone.now(), sent=False)
+        await Alert.objects.acreate(target_bot=bot, fixed_at=timezone.now() + timedelta(seconds=1), sent=False)
         await self._get_alert_sender().send_appropriate_alerts()
         mocked_send_message: AsyncMock = mocked_telegram_app.bot.send_message
         mocked_send_message.assert_called_once()

@@ -47,9 +47,10 @@ class AlertSender(ABC):
             total_count += 1
             sent = False
             if alert.is_fixed():
-                sent = await self.send_alert_fixed(alert)
+                if alert.has_passed_certainty_waiting_period(alert.fixed_at):
+                    sent = await self.send_alert_fixed(alert)
             else:
-                if alert.created_at <= timezone.now() - timedelta(seconds=settings.ALERT_CERTAINTY_WAIT_SECONDS):
+                if alert.has_passed_certainty_waiting_period():
                     sent = await self.send_alert(alert)
             if sent:
                 sent_count += 1

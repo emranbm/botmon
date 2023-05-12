@@ -1,3 +1,4 @@
+from datetime import timedelta
 from unittest.mock import AsyncMock
 
 from django.test import TestCase, override_settings
@@ -38,7 +39,7 @@ class AlertSenderTest(TestCase):
 
     async def test_should_send_fixed_alerts_as_fixed(self):
         user, bot = await testing_utils.create_user_and_their_bot_async()
-        await Alert.objects.acreate(target_bot=bot, fixed_at=timezone.now())
+        await Alert.objects.acreate(target_bot=bot, fixed_at=timezone.now() + timedelta(seconds=1))
         await self.alert_sender.send_appropriate_alerts()
         mocked_send_alert_fixed: AsyncMock = self.alert_sender.send_alert_fixed
         mocked_send_alert_fixed.assert_called_once()
@@ -59,3 +60,12 @@ class AlertSenderTest(TestCase):
         await self.alert_sender.send_appropriate_alerts()
         mocked_send_alert: AsyncMock = self.alert_sender.send_alert
         mocked_send_alert.assert_not_called()
+
+    async def test_should_not_send_alert_fixed_when_alert_not_notified_at_all(self):
+        user, bot = await testing_utils.create_user_and_their_bot_async()
+        await Alert.objects.acreate(target_bot=bot, fixed_at=timezone.now())
+        await self.alert_sender.send_appropriate_alerts()
+        mocked_send_alert: AsyncMock = self.alert_sender.send_alert
+        mocked_send_alert.assert_not_called()
+        mocked_send_alert_fixed: AsyncMock = self.alert_sender.send_alert_fixed
+        mocked_send_alert_fixed.assert_not_called()
